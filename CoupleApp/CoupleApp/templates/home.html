@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>home</title>
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" 
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+</head><script>
+    $(document).ready(function(){
+        $("#date").datepicker({});
+    });
+    function createBucketlist(){
+        $.ajax({
+            url:'/api/v1/bucketlists',
+            contentType : 'application/json',
+            method:'POST',
+            data : JSON.stringify({
+                title: $("#title").val(),
+                due: $("#date").val()
+            })
+
+        }).done(function(res){
+            $("#title").val('');
+            $("#date").val('');
+            window.location='/';
+        });
+    }
+    function doneBucketlist(bucket_id){
+      $.ajax({
+            url:'/api/v1/bucketlists',
+            contentType : 'application/json',
+            method:'PUT',
+            data : JSON.stringify({
+                bucket_id: bucket_id
+            })
+
+        }).done(function(res){
+            window.location='/';
+
+        });
+    }
+    function deleteBucketlist(bucket_id){
+      $.ajax({
+            url:'/api/v1/bucketlists',
+            contentType : 'application/json',
+            method:'DELETE',
+            data : JSON.stringify({
+                bucket_id: bucket_id
+            })
+
+        }).done(function(res){
+            window.location='/';
+
+        });
+    }
+    function Setdday(){
+        $.ajax({
+            url:'/api/v1/ddays',
+            contentType : 'application/json',
+            method:'PUT',
+            data : JSON.stringify({
+                due: $("#date").val()
+            })
+
+        }).done(function(res){
+            $("#date").val('');
+            window.location='/';
+        });
+    }
+     function AnswerQuest(){
+        $.ajax({
+            url:'/api/v1/quests',
+            contentType : 'application/json',
+            method:'POST',
+            data : JSON.stringify({
+                answer: $("#answer").val(),
+            })
+
+        }).done(function(res){
+            $("#answer").val('');
+            window.location='/';
+        });
+    }
+    function modifyAnswer(quest_id){
+      $.ajax({
+            url:'/api/v1/quests',
+            contentType : 'application/json',
+            method:'PUT',
+            data : JSON.stringify({
+                quest_id: quest_id
+            })
+
+        }).done(function(res){
+            window.location='/';
+
+        });
+    }
+</script>
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <p><h1> Home</h1></p>
+          </div>
+            {% if userid %}
+            <br>
+            <p>{{userid}}님 반갑습니다.</p>
+            {% endif %}
+            
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                
+                    {% if userid %}  
+                        <nav aria-label="breadcrumb">
+                          <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">홈</a></li>
+                            <li class="breadcrumb-item"><a href="logout">로그아웃</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">로그인</li>
+                          </ol>
+                        </nav>
+
+                        
+                      </li>
+                    {% else %}
+                    <nav aria-label="breadcrumb">
+                      <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">홈</a></li>
+                    <li class="breadcrumb-item"><a href="login">로그인</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">로그아웃</li>
+                  </ol>
+                  </nav>
+                  {%endif%}
+            </div>
+        </div>
+      <div class="row mt-5">
+            <div class="col-12">
+                    {% if not ddays %}  
+        <div class="row mt-5">
+            <h3>     ●최초접속</h3>
+            <div class = "col-12 col-sm-7 mt-2">
+                <input type="text" class="form-control" id="date"placeholder="사귄 날짜를 입력하세요."/>
+            </div>
+            <div class = "col-12 col-sm-5 mt-2">
+                <button type="button" class = "btn btn-primary" onclick="Setdday();">Submit</button>
+            </div>
+        </div>
+                	
+                    {%else%}
+            	<tr><td>●디데이 : 우리 사귄지 {{ d_day}}일째 입니다.</td></tr>
+                                 {% endif %}
+                  
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <h3>     ●버킷리스트 생성하기</h3>
+            <div class="col-12">
+                <!-- 제목 -->
+                <input type="text" class="form-control" id="title" placeholder="버킷리스트를 입력하세요."/>
+            </div>
+            <div class = "col-12 col-sm-7 mt-2">
+                <!-- 날짜 -->
+                <input type="text" class="form-control" id="date"placeholder="기한을 선택해주세요."/>
+            </div>
+            <div class = "col-12 col-sm-5 mt-2">
+                <!-- 완료처리 -->
+                <button type="button" class = "btn btn-primary" onclick="createBucketlist();">생성</button>
+            </div>
+        </div>
+
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>   ●버킷리스트 목록</h3>
+                <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">기한</th>
+                        <th scope="col">완료처리</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for bucketlist in bucketlists %}
+                        {% if bucketlist.status==1 %}
+                      <tr>
+                        <th scope="row"><del>◎</del></th>
+                        <td><del>{{ bucketlist.title}}</del></td>
+                        <td><del>{{ bucketlist.due }}</del></td>
+                        <td><button type="button" class ="btn btn-secondary" onclick="deleteBucketlist({{ bucketlist.id }})">삭제</button></td>
+                        
+                      </tr>
+                      {% else %}
+                      <tr>
+                      <th scope="row">◎</th>
+                      <td>{{ bucketlist.title }}</td>
+                      <td>{{ bucketlist.due }}</td>
+                      <td><button type="button" class ="btn btn-primary"onclick="doneBucketlist({{ bucketlist.id }})"> 완료</button></td>
+                      
+                    </tr>
+
+                      {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+
+
+   <div class="row mt-5">
+            <h3>     ●오늘의 질문</h3>
+           <div class="col-12">
+               <tr>
+                   {%if quests.title==None %}
+                    <td>등록된 질문이 없습니다.</td>
+                   {%else%}
+                        <td>{{quests.title}}</td> 
+       	             {%endif%}
+               </tr>
+       </div>
+       
+           <div class="container">
+    <div class="row">
+        <div class="col">
+       <div class="alert alert-primary" role="alert">
+                    <tr>
+                        {%if answer!=None%}
+                        
+                        {%if myanswer!=None%}
+                        <td>나의 답변 : {{ myanswer}}</td>
+                        <td><button type="button" class ="btn btn-secondary" onclick="modifyAnswer({{ quests.id }})">delete</button></td>
+                        {%else%}
+                        당신은 아직 답변을 등록하지 않았어요!
+                        {%endif%}
+                        
+                             {%else%}
+                         당신은 아직 답변을 등록하지 않았어요!
+                 {%endif%}
+                      </tr>
+      </div>
+      <div class="alert alert-danger" role="alert">
+             <tr>
+                        {%if answer!=None%}
+                 		{%if uranswer!=None%}
+                        <td>상대방의 답변 : {{ uranswer}}</td> 
+                        {%else%}
+                         상대방이 아직 답변을 등록하지 않았어요!
+                 {%endif%}       
+                 {%else%}
+                         상대방이 아직 답변을 등록하지 않았어요!
+                 {%endif%}
+                      </tr>
+      </div>
+       </div>
+        {%if myanswer==None%}
+            <div class="col-12">
+                <input type="text" class="form-control" id="answer" placeholder="답변을 입력하세요!"/>
+            </div>
+       
+            <div class = "col-12 col-sm-5 mt-2">
+                <button type="button" class = "btn btn-primary" onclick="AnswerQuest();">admit</button>
+            </div>
+        
+        {%endif%}
+        </div>
+    </div>
+    
+       
+       
+               <div class="row mt-5">
+            <div class="col-12">
+                <h3>   ●오늘의 질문 목록</h3>
+                <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">index</th>
+                        <th scope="col">질문 내용</th>
+                        <th scope="col">날짜</th>
+                        <th scope="col">나의 답변</th>
+                        <th scope="col">커플의 답변</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                      <tr>
+                        <th scope="row">{{questlist[0].id}}</th>
+                        <td>{{ questlist[0].title}}</td>
+                          {% for answer in answerlist %}
+                          <td>{{answer.tstamp}}</td> 
+                          <td>{{answer.answer1}}</td>
+                          <td>{{answer.answer2}}</td>
+
+                      </tr>
+                        
+                      {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+</body>
+</html>
